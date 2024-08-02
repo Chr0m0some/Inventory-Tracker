@@ -6,6 +6,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Search,
 } from "@mui/material";
 import { firestore } from "@/firebase";
 import {
@@ -16,12 +17,15 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 import { useState, useEffect } from "react";
 
 export default function Home() {
   const [inventory, setInventory] = useState([]);
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState("");
+  const [search, setSearch] = useState("");
   const updateInventory = async () => {
     const col = query(collection(firestore, "inventory"));
     const docs = await getDocs(col);
@@ -125,6 +129,15 @@ export default function Home() {
       >
         Add new Item
       </Button>
+      <TextField
+        id="search-items"
+        label="Search..."
+        type="search"
+        variant="filled"
+        onChange={(e) => {
+          setSearch(e.target.value);
+        }}
+      />
       <Box border={"1px solid black"}>
         <Box
           width={"800px"}
@@ -139,42 +152,85 @@ export default function Home() {
           </Typography>
         </Box>
         <Stack width={"800px"} height={"300px"} spacing={2} overflow={"auto"}>
-          {inventory.map(({ name, count }) => (
-            <Box
-              key={name}
-              width={"100%"}
-              minHeight={"150px"}
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              padding={5}
-            >
-              <Typography
-                variant="h3"
-                color={"black"}
-                textAlign={"center"}
-                textTransform={"capitalize"}
+          {!search &&
+            inventory.map(({ name, count }) => (
+              <Box
+                key={name}
+                width={"100%"}
+                minHeight={"150px"}
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                padding={5}
               >
-                {name}
-              </Typography>
-              <Typography variant="h3" color={"black"} textAlign={"center"}>
-                {count}
-              </Typography>
-              <Stack direction={"row"} spacing={2}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    addItem(name);
-                  }}
+                <Typography
+                  variant="h3"
+                  color={"black"}
+                  textAlign={"center"}
+                  textTransform={"capitalize"}
                 >
-                  Add
-                </Button>
-                <Button variant="contained" onClick={() => removeItem(name)}>
-                  Remove
-                </Button>
-              </Stack>
-            </Box>
-          ))}
+                  {name}
+                </Typography>
+                <Typography variant="h3" color={"black"} textAlign={"center"}>
+                  {count}
+                </Typography>
+                <Stack direction={"row"} spacing={2}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      addItem(name);
+                    }}
+                  >
+                    Add
+                  </Button>
+                  <Button variant="contained" onClick={() => removeItem(name)}>
+                    Remove
+                  </Button>
+                </Stack>
+              </Box>
+            ))}
+          {search &&
+            inventory
+              .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
+              .map(({ name, count }) => (
+                <Box
+                  key={name}
+                  width={"100%"}
+                  minHeight={"150px"}
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  padding={5}
+                >
+                  <Typography
+                    variant="h3"
+                    color={"black"}
+                    textAlign={"center"}
+                    textTransform={"capitalize"}
+                  >
+                    {name}
+                  </Typography>
+                  <Typography variant="h3" color={"black"} textAlign={"center"}>
+                    {count}
+                  </Typography>
+                  <Stack direction={"row"} spacing={2}>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        addItem(name);
+                      }}
+                    >
+                      Add
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => removeItem(name)}
+                    >
+                      Remove
+                    </Button>
+                  </Stack>
+                </Box>
+              ))}
         </Stack>
       </Box>
     </Box>
