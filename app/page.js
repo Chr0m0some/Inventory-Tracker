@@ -173,9 +173,9 @@ export default function Home() {
             </Modal>
             <Grid container spacing={2} p={2}>
               {!search &&
-                inventory.map(({ name, count }) => (
+                inventory.map(({ name, count }, index) => (
                   <Grid item xs={4}>
-                    <ItemCard name={name} count={count} />
+                    <ItemCard name={name} count={count} key={index} />
                   </Grid>
                 ))}
               {search &&
@@ -183,14 +183,12 @@ export default function Home() {
                   .filter((item) =>
                     item.name.toLowerCase().includes(search.toLowerCase())
                   )
-                  .map(({ name, count }) => (
+                  .map(({ name, count }, index) => (
                     <Grid item xs={3}>
-                      <ItemCard name={name} count={count} />
+                      <ItemCard name={name} count={count} key={index} />
                     </Grid>
                   ))}
             </Grid>
-            {/* </Stack>
-            </Box> */}
           </Box>
         </Container>
       </Box>
