@@ -174,8 +174,8 @@ export default function Home() {
             <Grid container spacing={2} p={2}>
               {!search &&
                 inventory.map(({ name, count }, index) => (
-                  <Grid item xs={4}>
-                    <ItemCard name={name} count={count} key={index} />
+                  <Grid item xs={4} key={index}>
+                    <ItemCard name={name} count={count} />
                   </Grid>
                 ))}
               {search &&
@@ -184,8 +184,8 @@ export default function Home() {
                     item.name.toLowerCase().includes(search.toLowerCase())
                   )
                   .map(({ name, count }, index) => (
-                    <Grid item xs={3}>
-                      <ItemCard name={name} count={count} key={index} />
+                    <Grid item xs={3} key={index}>
+                      <ItemCard name={name} count={count} />
                     </Grid>
                   ))}
             </Grid>
