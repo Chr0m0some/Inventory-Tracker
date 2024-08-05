@@ -6,7 +6,10 @@ import {
   Stack,
   TextField,
   Typography,
-  Search,
+  Container,
+  Divider,
+  IconButton,
+  Grid,
 } from "@mui/material";
 import { firestore } from "@/firebase";
 import {
@@ -17,9 +20,11 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import SearchIcon from "@mui/icons-material/Search";
-import InputAdornment from "@mui/material/InputAdornment";
 import { useState, useEffect } from "react";
+import theme from "./theme.js";
+import { ThemeProvider } from "@mui/material/styles";
+import PostAddIcon from "@mui/icons-material/PostAdd";
+import ItemCard from "./cardComponent.js";
 
 export default function Home() {
   const [inventory, setInventory] = useState([]);
@@ -71,168 +76,124 @@ export default function Home() {
     updateInventory();
   }, []);
   return (
-    <Box
-      width="100vw"
-      height="100vh"
-      display={"flex"}
-      justifyContent={"center"}
-      flexDirection={"column"}
-      alignItems={"center"}
-      gap={2}
-    >
-      <Typography variant="h1">Inventory</Typography>
-      <Modal open={open} onClose={handleClose}>
-        <Box
-          position={"absolute"}
-          top={"50%"}
-          left={"50%"}
-          sx={{
-            transform: "translate(-50%,-50%)",
-          }}
-          width={400}
-          bgcolor={"white"}
-          border={"2px solid #0000"}
-          boxShadow={24}
-          p={4}
-          display={"flex"}
-          flexDirection={"column"}
-          gap={3}
-        >
-          <Typography variant="h3">Add Item</Typography>
-          <Stack width={"100%"} direction={"row"} spacing={2}>
-            <TextField
-              variant="outlined"
-              fullWidth
-              value={itemName}
-              onChange={(e) => {
-                setItemName(e.target.value);
-              }}
-            />
-            <Button
-              variant="outlined"
-              onClick={() => {
-                addItem(itemName);
-                setItemName("");
-                handleClose();
-              }}
+    <ThemeProvider theme={theme}>
+      <Box width="100vw" height="100vh" sx={{ bgcolor: "background.default" }}>
+        <Container>
+          <Box
+            pt={2}
+            display={"flex"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography variant="h2">Inventory</Typography>
+            <Stack
+              direction={"row"}
+              spacing={2}
+              width={"50%"}
+              justifyContent="flex-end"
             >
-              Add
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
-      <Button
-        variant="contained"
-        onClick={() => {
-          handleOpen();
-        }}
-      >
-        Add new Item
-      </Button>
-      <TextField
-        id="search-items"
-        label="Search..."
-        type="search"
-        variant="filled"
-        onChange={(e) => {
-          setSearch(e.target.value);
-        }}
-      />
-      <Box border={"1px solid black"}>
-        <Box
-          width={"800px"}
-          height={"100px"}
-          bgcolor={"honeydew"}
-          justifyContent={"center"}
-          display={"flex"}
-          alignItems={"center"}
-        >
-          <Typography variant="h2" color={"black"}>
-            Inventory Items
-          </Typography>
-        </Box>
-        <Stack width={"800px"} height={"300px"} spacing={2} overflow={"auto"}>
-          {!search &&
-            inventory.map(({ name, count }) => (
-              <Box
-                key={name}
-                width={"100%"}
-                minHeight={"150px"}
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                padding={5}
+              <TextField
+                id="search-items"
+                label="Search..."
+                type="search"
+                variant="filled"
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                }}
+              />
+              <IconButton
+                sx={{
+                  borderRadius: "15%",
+                  padding: 2,
+                }}
+                size="small"
+                onClick={() => {
+                  handleOpen();
+                }}
               >
-                <Typography
-                  variant="h3"
-                  color={"black"}
-                  textAlign={"center"}
-                  textTransform={"capitalize"}
-                >
-                  {name}
-                </Typography>
-                <Typography variant="h3" color={"black"} textAlign={"center"}>
-                  {count}
-                </Typography>
-                <Stack direction={"row"} spacing={2}>
+                <PostAddIcon />
+              </IconButton>
+            </Stack>
+          </Box>
+          <Divider
+            sx={{
+              borderBottomWidth: 3,
+              my: 2,
+              borderColor: "black",
+            }}
+          />
+          <Box
+            width="100%"
+            height="100%"
+            display={"flex"}
+            justifyContent={"center"}
+            flexDirection={"column"}
+            alignItems={"center"}
+            gap={2}
+          >
+            <Modal open={open} onClose={handleClose}>
+              <Box
+                position={"absolute"}
+                top={"50%"}
+                left={"50%"}
+                sx={{
+                  transform: "translate(-50%,-50%)",
+                }}
+                width={400}
+                bgcolor={"white"}
+                border={"2px solid #0000"}
+                boxShadow={24}
+                p={4}
+                display={"flex"}
+                flexDirection={"column"}
+                gap={3}
+              >
+                <Typography variant="h3">Add Item</Typography>
+                <Stack width={"100%"} direction={"row"} spacing={2}>
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    value={itemName}
+                    onChange={(e) => {
+                      setItemName(e.target.value);
+                    }}
+                  />
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     onClick={() => {
-                      addItem(name);
+                      addItem(itemName);
+                      setItemName("");
+                      handleClose();
                     }}
                   >
                     Add
                   </Button>
-                  <Button variant="contained" onClick={() => removeItem(name)}>
-                    Remove
-                  </Button>
                 </Stack>
               </Box>
-            ))}
-          {search &&
-            inventory
-              .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
-              .map(({ name, count }) => (
-                <Box
-                  key={name}
-                  width={"100%"}
-                  minHeight={"150px"}
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  padding={5}
-                >
-                  <Typography
-                    variant="h3"
-                    color={"black"}
-                    textAlign={"center"}
-                    textTransform={"capitalize"}
-                  >
-                    {name}
-                  </Typography>
-                  <Typography variant="h3" color={"black"} textAlign={"center"}>
-                    {count}
-                  </Typography>
-                  <Stack direction={"row"} spacing={2}>
-                    <Button
-                      variant="contained"
-                      onClick={() => {
-                        addItem(name);
-                      }}
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={() => removeItem(name)}
-                    >
-                      Remove
-                    </Button>
-                  </Stack>
-                </Box>
-              ))}
-        </Stack>
+            </Modal>
+            <Grid container spacing={2} p={2}>
+              {!search &&
+                inventory.map(({ name, count }) => (
+                  <Grid item xs={4}>
+                    <ItemCard name={name} count={count} />
+                  </Grid>
+                ))}
+              {search &&
+                inventory
+                  .filter((item) =>
+                    item.name.toLowerCase().includes(search.toLowerCase())
+                  )
+                  .map(({ name, count }) => (
+                    <Grid item xs={3}>
+                      <ItemCard name={name} count={count} />
+                    </Grid>
+                  ))}
+            </Grid>
+            {/* </Stack>
+            </Box> */}
+          </Box>
+        </Container>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 }
